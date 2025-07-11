@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anil Bishnoi - Creative Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B1120;
+            color: #E2E8F0;
+            transition: background-color 1s ease;
+        }
+        body.menu-open {
+            overflow: hidden;
+        }
+
+        .section-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .background-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(79, 70, 229, 0) 60%);
+            transform: translate(-50%, -50%);
+            transition: all 1s ease;
+            z-index: 1;
+        }
+
+        .scroll-animated-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 1rem;
+            transform: perspective(1000px) rotateX(15deg) rotateY(-15deg) scale(0.8);
+            opacity: 0;
+            transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.8s ease;
+        }
+
+        .is-visible .scroll-animated-card {
+            transform: perspective(1000px) rotateX(0) rotateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .is-visible .fade-in-up {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+
+        .skill-bubble {
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .skill-bubble:hover {
+            background: #4f46e5;
+            transform: scale(1.05);
+        }
+        
+        .nav-link.active {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+        
+        #mobile-menu {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #mobile-menu.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Form Styles */
+        .form-input {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #4f46e5;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.5);
+        }
+        
+        #contact-form-wrapper {
+            transition: all 0.5s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body data-section="hero">
+
+    <div class="background-glow"></div>
+
+    <!-- Navigation Bar -->
+    <header id="navbar" class="fixed top-4 left-0 right-0 z-50 transition-transform duration-500 -translate-y-40">
+        <div class="container mx-auto px-4 sm:px-6">
+            <nav class="bg-slate-900/50 backdrop-blur-lg rounded-full shadow-lg p-2 flex justify-between items-center">
+                <a href="#hero" class="ml-2 text-lg font-bold text-white transition-transform hover:scale-105">Anil Bishnoi</a>
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center space-x-1">
+                    <a href="#hero" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Home</a>
+                    <a href="#about" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">About</a>
+                    <a href="#projects" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Projects</a>
+                    <a href="#skills" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Skills</a>
+                    <a href="#contact" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Contact</a>
+                </div>
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-full text-white hover:bg-slate-800 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-xl z-40">
+        <button id="mobile-menu-close-btn" class="absolute top-6 right-6 p-2 text-white">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <nav class="flex flex-col items-center justify-center h-full space-y-8">
+            <a href="#hero" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Home</a>
+            <a href="#about" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">About</a>
+            <a href="#projects" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Projects</a>
+            <a href="#skills" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Skills</a>
+            <a href="#contact" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Contact</a>
+        </nav>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="section-container">
+        <div class="text-center max-w-4xl mx-auto">
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white tracking-tighter">
+                <span class="fade-in-up">Anil Bishnoi.</span>
+                <span class="fade-in-up delay-1">Creative</span>
+                <span class="fade-in-up delay-2">Developer.</span>
+            </h1>
+            <p class="mt-6 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto fade-in-up delay-3">
+                I design and build beautiful, high-performance websites that provide exceptional user experiences.
+            </p>
+            <div class="mt-10 fade-in-up delay-4">
+                <a href="#about" class="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
+                    Explore My World
+                    <span class="ml-2">↓</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section-container">
+        <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div class="scroll-animated-card p-8">
+                <h2 class="text-3xl font-bold text-white mb-4">About Me</h2>
+                <p class="text-slate-300 mb-4">
+                    Hello! I'm Anil Bishnoi, a passionate developer and a student at Lachoo Memorial College, Jodhpur. My journey into web development began a year ago, driven by a desire to not just write code, but to create meaningful and intuitive digital experiences.
+                </p>
+                <p class="text-slate-300">
+                    I specialize in front-end development, focusing on clean code, modern design principles, and interactive animations that bring websites to life. I'm a fast learner, constantly exploring new technologies to push the boundaries of what's possible.
+                </p>
+            </div>
+            <div class="text-center md:text-left fade-in-up">
+                <h3 class="text-4xl font-bold text-white">Let's build the future,</h3>
+                <h3 class="text-4xl font-bold text-indigo-400">one line of code at a time.</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section-container flex-col">
+        <h2 class="text-4xl md:text-5xl font-bold text-white text-center mb-16 fade-in-up">Things I've Built</h2>
+        <div class="w-full max-w-6xl grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Project 1 -->
+            <div class="scroll-animated-card p-6 delay-1">
+                <h3 class="text-xl font-bold text-white">University Result Portal</h3>
+                <p class="text-slate-400 mt-2">A secure and dynamic portal for students to check academic results.</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">React</span>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Node.js</span>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">MongoDB</span>
+                </div>
+            </div>
+            <!-- Project 2 -->
+            <div class="scroll-animated-card p-6 delay-2">
+                <h3 class="text-xl font-bold text-white">E-commerce Platform</h3>
+                <p class="text-slate-400 mt-2">A full-featured online store with product listings and a shopping cart.</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Next.js</span>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Stripe API</span>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Tailwind</span>
+                </div>
+            </div>
+            <!-- Project 3 -->
+            <div class="scroll-animated-card p-6 delay-3">
+                <h3 class="text-xl font-bold text-white">Immersive Portfolio</h3>
+                <p class="text-slate-400 mt-2">This animated, single-page portfolio you're exploring now.</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">JavaScript</span>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Tailwind</span>
+                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">HTML5</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section-container flex-col">
+        <h2 class="text-4xl md:text-5xl font-bold text-white text-center mb-16 fade-in-up">My Tech Stack</h2>
+        <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-4">
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-1">TypeScript</div>
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-2">React / Next.js</div>
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-3">Vue.js</div>
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-4">Node.js</div>
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-1">Tailwind CSS</div>
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-2">Figma</div>
+            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-3">Git & GitHub</div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section-container">
+        <div class="text-center max-w-2xl mx-auto w-full">
+            <h2 class="text-4xl md:text-5xl font-bold text-white fade-in-up">Let's Connect.</h2>
+            <p class="mt-4 text-lg text-slate-300 fade-in-up delay-1">
+                Have a project in mind or just want to say hello? My inbox is always open.
+            </p>
+            <div id="contact-cta" class="mt-8 fade-in-up delay-2">
+                <button id="open-contact-form-btn" class="inline-block px-10 py-5 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
+                    Say Hello
+                </button>
+            </div>
+            <div id="contact-form-wrapper" class="w-full mt-8 opacity-0">
+                <form id="contact-form" class="w-full max-w-lg mx-auto text-left space-y-4">
+                    <div>
+                        <label for="name" class="sr-only">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Your Name" required class="w-full p-4 rounded-lg form-input">
+                    </div>
+                    <div>
+                        <label for="email" class="sr-only">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Your Email" required class="w-full p-4 rounded-lg form-input">
+                    </div>
+                    <div>
+                        <label for="phone" class="sr-only">Mobile Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="Your Mobile Number" class="w-full p-4 rounded-lg form-input">
+                    </div>
+                    <div>
+                        <label for="message" class="sr-only">Message</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Your Message" required class="w-full p-4 rounded-lg form-input"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" id="submit-btn" class="w-full px-10 py-4 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
+                            Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const navbar = document.getElementById('navbar');
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenuCloseBtn = document.getElementById('mobile-menu-close-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+        const openContactFormBtn = document.getElementById('open-contact-form-btn');
+        const contactFormWrapper = document.getElementById('contact-form-wrapper');
+        const contactForm = document.getElementById('contact-form');
+        const contactCta = document.getElementById('contact-cta');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // --- Contact Form Logic ---
+        openContactFormBtn.addEventListener('click', () => {
+            contactCta.style.display = 'none';
+            contactFormWrapper.classList.remove('opacity-0');
+            contactFormWrapper.style.maxHeight = '600px';
+        });
+
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1H-qTdQ6xuEKWXcVjHEsn24u_FSKxB_Pjk-seGgUczt20bnl322QwGkMYdlR3SRKl/exec';
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+
+            // This updated fetch logic is more robust for handling Google Apps Script submissions.
+            // It prevents the "Failed to fetch" error that often occurs due to CORS redirects.
+            fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: new FormData(contactForm),
+                mode: 'no-cors', // This is a key change to prevent CORS errors
+            })
+            .then(res => {
+                // Because of 'no-cors' mode, we can't read the response.
+                // We assume success if the request doesn't throw an error.
+                contactFormWrapper.innerHTML = `<p class="text-center text-lg text-green-400">Thank you! Your message has been sent successfully.</p>`;
+            })
+            .catch(error => {
+                // This will now only catch actual network failures.
+                console.error('Error!', error.message);
+                contactFormWrapper.innerHTML = `<p class="text-center text-lg text-red-400">Oops! Something went wrong. Please check your network and try again.</p>`;
+            });
+        });
+
+
+        // --- Mobile Menu Toggle ---
+        const toggleMenu = () => {
+            mobileMenu.classList.toggle('hidden');
+            document.body.classList.toggle('menu-open');
+        };
+        mobileMenuBtn.addEventListener('click', toggleMenu);
+        mobileMenuCloseBtn.addEventListener('click', toggleMenu);
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        // --- Navbar Visibility on Scroll ---
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > window.innerHeight * 0.8) {
+                navbar.classList.remove('-translate-y-40');
+            } else {
+                navbar.classList.add('-translate-y-40');
+            }
+        });
+
+        // --- Intersection Observer for Animations & Active Nav Link ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    
+                    const sectionId = entry.target.id;
+                    document.body.dataset.section = sectionId;
+                    updateGlow(sectionId);
+
+                    // Update active nav link for desktop
+                    const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                    }
+                }
+            });
+        }, { threshold: 0.4 });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Initial animation for hero section
+        document.querySelector('#hero').classList.add('is-visible');
+
+        // --- Background Glow Effect ---
+        const glow = document.querySelector('.background-glow');
+        function updateGlow(sectionId) {
+            switch(sectionId) {
+                case 'about':
+                    glow.style.background = 'radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0) 60%)'; // Violet
+                    break;
+                case 'projects':
+                    glow.style.background = 'radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0) 60%)'; // Green
+                    break;
+                case 'skills':
+                    glow.style.background = 'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 60%)'; // Blue
+                    break;
+                case 'contact':
+                     glow.style.background = 'radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(236, 72, 153, 0) 60%)'; // Pink
+                    break;
+                default: // hero
+                    glow.style.background = 'radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(79, 70, 229, 0) 60%)'; // Indigo
+            }
+        }
+    </script>
+</body>
+</html>
