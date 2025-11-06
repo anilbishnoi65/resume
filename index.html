@@ -1,401 +1,971 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anil Bishnoi - Creative Developer</title>
+    <title>digiclick - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0B1120;
-            color: #E2E8F0;
-            transition: background-color 1s ease;
-        }
-        body.menu-open {
-            overflow: hidden;
-        }
-
-        .section-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem 1.5rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .background-glow {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 800px;
-            height: 800px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(79, 70, 229, 0) 60%);
-            transform: translate(-50%, -50%);
-            transition: all 1s ease;
-            z-index: 1;
-        }
-
-        .scroll-animated-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 1rem;
-            transform: perspective(1000px) rotateX(15deg) rotateY(-15deg) scale(0.8);
-            opacity: 0;
-            transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.8s ease;
-        }
-
-        .is-visible .scroll-animated-card {
-            transform: perspective(1000px) rotateX(0) rotateY(0) scale(1);
-            opacity: 1;
-        }
-        
-        .fade-in-up {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        
-        .is-visible .fade-in-up {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .delay-1 { transition-delay: 0.1s; }
-        .delay-2 { transition-delay: 0.2s; }
-        .delay-3 { transition-delay: 0.3s; }
-        .delay-4 { transition-delay: 0.4s; }
-
-        .skill-bubble {
-            background: rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        .skill-bubble:hover {
-            background: #4f46e5;
-            transform: scale(1.05);
-        }
-        
-        .nav-link.active {
-            background-color: #4f46e5;
-            color: #ffffff;
-        }
-        
-        #mobile-menu {
-            transition: opacity 0.3s ease-in-out;
-        }
-        #mobile-menu.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Form Styles */
-        .form-input {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-        .form-input:focus {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: #4f46e5;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.5);
-        }
-        
-        #contact-form-wrapper {
-            transition: all 0.5s ease-in-out;
-            max-height: 0;
-            overflow: hidden;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .modal, .loader-overlay, #sidebar, #sidebar-overlay { transition: all 0.3s ease-in-out; }
+        /* Sidebar transitions specifically for the transform property */
+        #sidebar { transition-property: transform; }
+        .sidebar-link { transition: background-color 0.2s, color 0.2s; }
+        .sidebar-link.active { background-color: #4f46e5; color: white; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .status-badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; text-transform: capitalize; }
+        .status-pending { background-color: #fef9c3; color: #ca8a04; }
+        .status-approved { background-color: #dcfce7; color: #16a34a; }
+        .status-rejected { background-color: #fee2e2; color: #dc2626; }
+        .toggle-bg:after { content: ''; position: absolute; top: 2px; left: 2px; background: white; border-radius: 50%; height: 1.25rem; width: 1.25rem; transition: transform 0.2s; }
+        input:checked + .toggle-bg:after { transform: translateX(100%); }
+        input:checked + .toggle-bg { background-color: #4f46e5; }
     </style>
 </head>
-<body data-section="hero">
+<body class="bg-gray-100">
 
-    <div class="background-glow"></div>
-
-    <!-- Navigation Bar -->
-    <header id="navbar" class="fixed top-4 left-0 right-0 z-50 transition-transform duration-500 -translate-y-40">
-        <div class="container mx-auto px-4 sm:px-6">
-            <nav class="bg-slate-900/50 backdrop-blur-lg rounded-full shadow-lg p-2 flex justify-between items-center">
-                <a href="#hero" class="ml-2 text-lg font-bold text-white transition-transform hover:scale-105">Anil Bishnoi</a>
-                <!-- Desktop Nav -->
-                <div class="hidden md:flex items-center space-x-1">
-                    <a href="#hero" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Home</a>
-                    <a href="#about" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">About</a>
-                    <a href="#projects" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Projects</a>
-                    <a href="#skills" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Skills</a>
-                    <a href="#contact" class="nav-link px-4 py-2 text-sm rounded-full transition-colors duration-300">Contact</a>
+    <div id="login-screen" class="flex items-center justify-center min-h-screen bg-gray-200 p-4">
+        <div class="w-full max-w-sm p-8 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Admin Panel Login</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" id="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
                 </div>
-                <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-full text-white hover:bg-slate-800 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
-            </nav>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                 <p id="login-error" class="text-sm text-red-600 mb-4"></p>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Login</button>
+            </form>
         </div>
-    </header>
-
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-xl z-40">
-        <button id="mobile-menu-close-btn" class="absolute top-6 right-6 p-2 text-white">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
-        <nav class="flex flex-col items-center justify-center h-full space-y-8">
-            <a href="#hero" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Home</a>
-            <a href="#about" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">About</a>
-            <a href="#projects" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Projects</a>
-            <a href="#skills" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Skills</a>
-            <a href="#contact" class="mobile-nav-link text-3xl font-bold text-slate-300 hover:text-white">Contact</a>
-        </nav>
     </div>
 
-    <!-- Hero Section -->
-    <section id="hero" class="section-container">
-        <div class="text-center max-w-4xl mx-auto">
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white tracking-tighter">
-                <span class="fade-in-up">Anil Bishnoi.</span>
-                <span class="fade-in-up delay-1">Creative</span>
-                <span class="fade-in-up delay-2">Developer.</span>
-            </h1>
-            <p class="mt-6 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto fade-in-up delay-3">
-                I design and build beautiful, high-performance websites that provide exceptional user experiences.
-            </p>
-            <div class="mt-10 fade-in-up delay-4">
-                <a href="#about" class="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
-                    Explore My World
-                    <span class="ml-2">↓</span>
-                </a>
-            </div>
-        </div>
-    </section>
+    <div id="admin-dashboard" class="hidden">
+        <div id="sidebar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-30 opacity-0 pointer-events-none md:hidden"></div>
 
-    <!-- About Section -->
-    <section id="about" class="section-container">
-        <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            <div class="scroll-animated-card p-8">
-                <h2 class="text-3xl font-bold text-white mb-4">About Me</h2>
-                <p class="text-slate-300 mb-4">
-                    Hello! I'm Anil Bishnoi, a passionate developer and a student at Lachoo Memorial College, Jodhpur. My journey into web development began a year ago, driven by a desire to not just write code, but to create meaningful and intuitive digital experiences.
-                </p>
-                <p class="text-slate-300">
-                    I specialize in front-end development, focusing on clean code, modern design principles, and interactive animations that bring websites to life. I'm a fast learner, constantly exploring new technologies to push the boundaries of what's possible.
-                </p>
-            </div>
-            <div class="text-center md:text-left fade-in-up">
-                <h3 class="text-4xl font-bold text-white">Let's build the future,</h3>
-                <h3 class="text-4xl font-bold text-indigo-400">one line of code at a time.</h3>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="section-container flex-col">
-        <h2 class="text-4xl md:text-5xl font-bold text-white text-center mb-16 fade-in-up">Things I've Built</h2>
-        <div class="w-full max-w-6xl grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Project 1 -->
-            <div class="scroll-animated-card p-6 delay-1">
-                <h3 class="text-xl font-bold text-white">University Result Portal</h3>
-                <p class="text-slate-400 mt-2">A secure and dynamic portal for students to check academic results.</p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">React</span>
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Node.js</span>
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">MongoDB</span>
+        <div class="flex h-screen bg-gray-100 overflow-hidden">
+            <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-800 text-white flex flex-col transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:flex shrink-0">
+                <div class="h-16 flex items-center justify-between px-4 bg-gray-900 md:justify-center md:bg-transparent">
+                    <div class="text-2xl font-bold">Admin Panel</div>
+                    <button id="close-sidebar-btn" class="md:hidden text-gray-400 hover:text-white focus:outline-none">
+                        <i class="fas fa-times fa-lg"></i>
+                    </button>
                 </div>
-            </div>
-            <!-- Project 2 -->
-            <div class="scroll-animated-card p-6 delay-2">
-                <h3 class="text-xl font-bold text-white">E-commerce Platform</h3>
-                <p class="text-slate-400 mt-2">A full-featured online store with product listings and a shopping cart.</p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Next.js</span>
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Stripe API</span>
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Tailwind</span>
+                <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                    <a href="#dashboard" class="sidebar-link active flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-tachometer-alt w-6 mr-3"></i>Dashboard</a>
+                    <a href="#products" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-box-open w-6 mr-3"></i>Products</a>
+                    <a href="#orders" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-receipt w-6 mr-3"></i>Orders</a>
+                    <a href="#verifications" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700 relative"><i class="fas fa-check-double w-6 mr-3"></i>Verifications <span id="pending-verifications-badge" class="absolute right-2 top-1/2 -translate-y-1/2 bg-yellow-500 text-black text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span></a>
+                    <a href="#reviews" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-star w-6 mr-3"></i>Reviews</a>
+                    <a href="#users" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-users w-6 mr-3"></i>Users</a>
+                    <a href="#marketing" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-bullhorn w-6 mr-3"></i>Marketing</a>
+                    <a href="#paymentQRs" class="sidebar-link flex items-center px-4 py-2 rounded-md hover:bg-gray-700"><i class="fas fa-qrcode w-6 mr-3"></i>Payment QRs</a>
+                </nav>
+                <div class="p-4 border-t border-gray-700">
+                    <button id="logout-btn" class="w-full flex items-center px-4 py-2 rounded-md text-red-400 hover:bg-red-500 hover:text-white"><i class="fas fa-sign-out-alt w-6 mr-3"></i>Logout</button>
                 </div>
-            </div>
-            <!-- Project 3 -->
-            <div class="scroll-animated-card p-6 delay-3">
-                <h3 class="text-xl font-bold text-white">Immersive Portfolio</h3>
-                <p class="text-slate-400 mt-2">This animated, single-page portfolio you're exploring now.</p>
-                <div class="mt-4 flex flex-wrap gap-2">
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">JavaScript</span>
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">Tailwind</span>
-                    <span class="text-xs bg-indigo-900 text-indigo-300 px-2 py-1 rounded-full">HTML5</span>
-                </div>
+            </aside>
+
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+                <header class="md:hidden bg-white shadow-sm p-4 flex items-center justify-between z-20 relative">
+                    <button id="mobile-menu-btn" class="text-gray-800 focus:outline-none p-1">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </button>
+                    <h1 id="mobile-header-title" class="text-lg font-bold text-gray-800">Dashboard</h1>
+                    <div class="w-6"></div> <!-- Spacer -->
+                </header>
+
+                <main class="flex-1 p-4 md:p-10 overflow-y-auto">
+                    <section id="dashboard-section" class="content-section active">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                            <div class="bg-white p-6 rounded-lg shadow-md"><h3 class="text-gray-500">Total Products</h3><p id="total-products" class="text-3xl font-bold">0</p></div>
+                            <div class="bg-white p-6 rounded-lg shadow-md"><h3 class="text-gray-500">Total Users</h3><p id="total-users" class="text-3xl font-bold">0</p></div>
+                            <div class="bg-white p-6 rounded-lg shadow-md"><h3 class="text-gray-500">Pending Verifications</h3><p id="pending-verifications" class="text-3xl font-bold">0</p></div>
+                            <div class="bg-white p-6 rounded-lg shadow-md"><h3 class="text-gray-500">Total Orders</h3><p id="total-orders" class="text-3xl font-bold">0</p></div>
+                        </div>
+                         <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Recent Pending Verifications</h2>
+                        <div class="bg-white p-4 md:p-6 rounded-lg shadow-md"><div class="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50"><tr><th class="px-4 md:px-6 py-3">User</th><th class="px-4 md:px-6 py-3">Amount</th><th class="px-4 md:px-6 py-3 whitespace-nowrap">Tx ID</th><th class="px-4 md:px-6 py-3">Date</th><th class="px-4 md:px-6 py-3">Actions</th></tr></thead><tbody id="recent-verifications-table"></tbody></table></div></div>
+                    </section>
+
+                    <section id="products-section" class="content-section">
+                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h1 class="text-2xl md:text-3xl font-bold">Products</h1><button id="add-product-btn" class="w-full sm:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Add Product</button></div>
+                         <div class="bg-white p-4 rounded-lg shadow-md"><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3 whitespace-nowrap">Name</th><th class="px-4 py-3">Type</th><th class="px-4 py-3">Price From</th><th class="px-4 py-3 whitespace-nowrap">Total Stock</th><th class="px-4 py-3">Featured</th><th class="px-4 py-3">Actions</th></tr></thead><tbody id="products-table"></tbody></table></div></div>
+                    </section>
+
+                    <section id="orders-section" class="content-section">
+                        <h1 class="text-2xl md:text-3xl font-bold mb-6">All User Orders</h1>
+                        <div class="bg-white p-4 rounded-lg shadow-md"><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3 whitespace-nowrap">Order ID</th><th class="px-4 py-3 whitespace-nowrap">User Email</th><th class="px-4 py-3">Phone</th><th class="px-4 py-3">Total</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Items</th></tr></thead><tbody id="orders-table"></tbody></table></div></div>
+                    </section>
+
+                    <section id="verifications-section" class="content-section">
+                        <h1 class="text-2xl md:text-3xl font-bold mb-6">Payment Verifications</h1>
+                        <div class="bg-white p-4 rounded-lg shadow-md"><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3 whitespace-nowrap">User</th><th class="px-4 py-3">Amount</th><th class="px-4 py-3 whitespace-nowrap">Tx ID</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Date</th><th class="px-4 py-3">Actions</th></tr></thead><tbody id="verifications-table"></tbody></table></div></div>
+                    </section>
+
+                    <section id="reviews-section" class="content-section">
+                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h1 class="text-2xl md:text-3xl font-bold">Reviews</h1><button id="add-review-btn" class="w-full sm:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Add Review</button></div>
+                         <div class="bg-white p-4 rounded-lg shadow-md"><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3 whitespace-nowrap">Name</th><th class="px-4 py-3">Stars</th><th class="px-4 py-3 min-w-[200px]">Text</th><th class="px-4 py-3">Actions</th></tr></thead><tbody id="reviews-table"></tbody></table></div></div>
+                    </section>
+
+                    <section id="users-section" class="content-section">
+                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                             <h1 class="text-2xl md:text-3xl font-bold">Users</h1>
+                             <input type="text" id="user-search" placeholder="Search email..." class="w-full sm:w-1/3 px-3 py-2 border rounded-md">
+                         </div>
+                         <div class="bg-white p-4 rounded-lg shadow-md"><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3 whitespace-nowrap">Email</th><th class="px-4 py-3 whitespace-nowrap">Wallet Bal.</th><th class="px-4 py-3 whitespace-nowrap">Joined On</th><th class="px-4 py-3">Actions</th></tr></thead><tbody id="users-table"></tbody></table></div></div>
+                    </section>
+
+                    <section id="marketing-section" class="content-section">
+                        <h1 class="text-2xl md:text-3xl font-bold mb-6">Marketing</h1>
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                            <div class="bg-white p-6 rounded-lg shadow-md">
+                                <h2 class="text-xl font-bold mb-4">Homepage Banner</h2>
+                                <form id="banner-form" class="space-y-4">
+                                    <div><label class="font-medium">Title</label><input name="heroTitle" class="mt-1 block w-full border rounded-md p-2"></div>
+                                    <div><label class="font-medium">Subtitle</label><input name="heroSubtitle" class="mt-1 block w-full border rounded-md p-2"></div>
+                                    <div><label class="font-medium">Image URL</label><input name="heroImageUrl" class="mt-1 block w-full border rounded-md p-2"></div>
+                                    <div><label class="font-medium">Button Text</label><input name="heroButtonText" class="mt-1 block w-full border rounded-md p-2"></div>
+                                    <div><label class="font-medium">Button Link</label><input name="heroButtonLink" class="mt-1 block w-full border rounded-md p-2"></div>
+                                    <button type="submit" class="w-full sm:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Save Banner</button>
+                                </form>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow-md">
+                                <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Coupons</h2><button id="add-coupon-btn" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 text-sm">Add Coupon</button></div>
+                                <div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3">Code</th><th class="px-4 py-3">Type</th><th class="px-4 py-3">Value</th><th class="px-4 py-3">Actions</th></tr></thead><tbody id="coupons-table"></tbody></table></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="paymentQRs-section" class="content-section">
+                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h1 class="text-2xl md:text-3xl font-bold">Payment QRs</h1><button id="add-qr-btn" class="w-full sm:w-auto bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">Add QR Code</button></div>
+                         <div class="bg-white p-4 rounded-lg shadow-md"><div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs uppercase bg-gray-50"><tr><th class="px-4 py-3 whitespace-nowrap">Name</th><th class="px-4 py-3 min-w-[150px]">Image URL</th><th class="px-4 py-3">Preview</th><th class="px-4 py-3">Actions</th></tr></thead><tbody id="qrs-table"></tbody></table></div></div>
+                    </section>
+                </main>
             </div>
         </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="section-container flex-col">
-        <h2 class="text-4xl md:text-5xl font-bold text-white text-center mb-16 fade-in-up">My Tech Stack</h2>
-        <div class="max-w-4xl mx-auto flex flex-wrap justify-center gap-4">
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-1">TypeScript</div>
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-2">React / Next.js</div>
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-3">Vue.js</div>
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-4">Node.js</div>
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-1">Tailwind CSS</div>
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-2">Figma</div>
-            <div class="skill-bubble p-4 rounded-lg fade-in-up delay-3">Git & GitHub</div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="section-container">
-        <div class="text-center max-w-2xl mx-auto w-full">
-            <h2 class="text-4xl md:text-5xl font-bold text-white fade-in-up">Let's Connect.</h2>
-            <p class="mt-4 text-lg text-slate-300 fade-in-up delay-1">
-                Have a project in mind or just want to say hello? My inbox is always open.
-            </p>
-            <div id="contact-cta" class="mt-8 fade-in-up delay-2">
-                <button id="open-contact-form-btn" class="inline-block px-10 py-5 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
-                    Say Hello
-                </button>
-            </div>
-            <div id="contact-form-wrapper" class="w-full mt-8 opacity-0">
-                <form id="contact-form" class="w-full max-w-lg mx-auto text-left space-y-4">
-                    <div>
-                        <label for="name" class="sr-only">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Your Name" required class="w-full p-4 rounded-lg form-input">
+    </div>
+    
+    <!-- Modals -->
+    <div id="product-modal" class="modal hidden fixed z-50 inset-0 bg-gray-600 bg-opacity-50 opacity-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+                <!-- Changed p-6 to 0 and added inner container for scrolling -->
+                <form id="product-form" class="flex flex-col max-h-[90vh]">
+                    <div class="p-6 border-b">
+                        <h3 id="product-modal-title" class="text-xl font-semibold">Add Product</h3>
                     </div>
-                    <div>
-                        <label for="email" class="sr-only">Email</label>
-                        <input type="email" id="email" name="email" placeholder="Your Email" required class="w-full p-4 rounded-lg form-input">
+                    <!-- Form content now scrolls -->
+                    <div class="p-6 space-y-4 overflow-y-auto">
+                        <!-- Product Details -->
+                        <div><label class="font-medium">Name</label><input name="name" class="mt-1 block w-full border rounded-md p-2" required></div>
+                        <div><label class="font-medium">Description</label><textarea name="description" class="mt-1 block w-full border rounded-md p-2 h-24"></textarea></div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div><label class="font-medium">Type</label><select name="type" class="mt-1 block w-full border rounded-md p-2"><option>OTT</option><option>Software</option></select></div>
+                            <div><label class="font-medium">Image URL</label><input name="imageUrl" class="mt-1 block w-full border rounded-md p-2"></div>
+                        </div>
+                        <div class="flex items-center"><input type="checkbox" name="isFeatured" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-2"><label>Featured on Homepage?</label></div>
+                        
+                        <!-- Variants Section -->
+                        <div class="border-t pt-4 mt-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-lg font-semibold">Variants (Plans & Keys)</h4>
+                                <button type="button" id="add-variant-btn" class="bg-indigo-500 text-white py-1 px-3 rounded-md text-sm hover:bg-indigo-600">Add Variant</button>
+                            </div>
+                            <div id="variants-container" class="space-y-4">
+                                <!-- Variant blocks will be injected here -->
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label for="phone" class="sr-only">Mobile Number</label>
-                        <input type="tel" id="phone" name="phone" placeholder="Your Mobile Number" class="w-full p-4 rounded-lg form-input">
-                    </div>
-                    <div>
-                        <label for="message" class="sr-only">Message</label>
-                        <textarea id="message" name="message" rows="4" placeholder="Your Message" required class="w-full p-4 rounded-lg form-input"></textarea>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" id="submit-btn" class="w-full px-10 py-4 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105">
-                            Send Message
-                        </button>
+                    <div class="p-6 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-lg">
+                        <button type="button" id="cancel-product-modal" class="bg-gray-200 py-2 px-4 rounded-md">Cancel</button>
+                        <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md">Save</button>
                     </div>
                 </form>
             </div>
         </div>
-    </section>
+    </div>
+    <div id="review-modal" class="modal hidden fixed z-50 inset-0 bg-gray-600 bg-opacity-50 opacity-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                <form id="review-form" class="p-6"><h3 id="review-modal-title" class="text-xl font-semibold mb-4">Add Review</h3><div class="space-y-4"></div><div class="mt-6 flex justify-end space-x-3"><button type="button" id="cancel-review-modal" class="bg-gray-200 py-2 px-4 rounded-md">Cancel</button><button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md">Save</button></div></form>
+            </div>
+        </div>
+    </div>
+    <div id="coupon-modal" class="modal hidden fixed z-50 inset-0 bg-gray-600 bg-opacity-50 opacity-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                <form id="coupon-form" class="p-6"><h3 id="coupon-modal-title" class="text-xl font-semibold mb-4">Add Coupon</h3><div class="space-y-4"></div><div class="mt-6 flex justify-end space-x-3"><button type="button" id="cancel-coupon-modal" class="bg-gray-200 py-2 px-4 rounded-md">Cancel</button><button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md">Save</button></div></form>
+            </div>
+        </div>
+    </div>
+    <div id="qr-modal" class="modal hidden fixed z-50 inset-0 bg-gray-600 bg-opacity-50 opacity-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg">
+                <form id="qr-form" class="p-6"><h3 id="qr-modal-title" class="text-xl font-semibold mb-4">Add QR Code</h3><div class="space-y-4"></div><div class="mt-6 flex justify-end space-x-3"><button type="button" id="cancel-qr-modal" class="bg-gray-200 py-2 px-4 rounded-md">Cancel</button><button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md">Save</button></div></form>
+            </div>
+        </div>
+    </div>
+     <div id="user-detail-modal" class="modal hidden fixed z-50 inset-0 bg-gray-600 bg-opacity-50 opacity-0 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+             <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl relative">
+                 <div class="p-6 md:p-8" id="user-detail-content"></div>
+             </div>
+        </div>
+    </div>
+    <div id="loader-overlay" class="loader-overlay hidden fixed z-[60] inset-0 bg-gray-900 bg-opacity-50 opacity-0 flex items-center justify-center"><i class="fas fa-spinner fa-spin text-5xl text-white"></i></div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc, addDoc, updateDoc, deleteDoc, serverTimestamp, runTransaction, query, orderBy, getDocs, where, writeBatch, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <script>
-        const navbar = document.getElementById('navbar');
-        const sections = document.querySelectorAll('section');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenuCloseBtn = document.getElementById('mobile-menu-close-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
-        const openContactFormBtn = document.getElementById('open-contact-form-btn');
-        const contactFormWrapper = document.getElementById('contact-form-wrapper');
-        const contactForm = document.getElementById('contact-form');
-        const contactCta = document.getElementById('contact-cta');
-        const submitBtn = document.getElementById('submit-btn');
-
-        // --- Contact Form Logic ---
-        openContactFormBtn.addEventListener('click', () => {
-            contactCta.style.display = 'none';
-            contactFormWrapper.classList.remove('opacity-0');
-            contactFormWrapper.style.maxHeight = '600px';
-        });
-
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx1H-qTdQ6xuEKWXcVjHEsn24u_FSKxB_Pjk-seGgUczt20bnl322QwGkMYdlR3SRKl/exec';
-
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Sending...';
-
-            // This updated fetch logic is more robust for handling Google Apps Script submissions.
-            // It prevents the "Failed to fetch" error that often occurs due to CORS redirects.
-            fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                body: new FormData(contactForm),
-                mode: 'no-cors', // This is a key change to prevent CORS errors
-            })
-            .then(res => {
-                // Because of 'no-cors' mode, we can't read the response.
-                // We assume success if the request doesn't throw an error.
-                contactFormWrapper.innerHTML = `<p class="text-center text-lg text-green-400">Thank you! Your message has been sent successfully.</p>`;
-            })
-            .catch(error => {
-                // This will now only catch actual network failures.
-                console.error('Error!', error.message);
-                contactFormWrapper.innerHTML = `<p class="text-center text-lg text-red-400">Oops! Something went wrong. Please check your network and try again.</p>`;
-            });
-        });
-
-
-        // --- Mobile Menu Toggle ---
-        const toggleMenu = () => {
-            mobileMenu.classList.toggle('hidden');
-            document.body.classList.toggle('menu-open');
+        // IMPORTANT: Use the same Firebase config as your website
+        const firebaseConfig = {
+            apiKey: "AIzaSyCw5iau9JmPXtAHB6Ty9zUDS4P5NxKWXAI",
+            authDomain: "digi-2eb26.firebaseapp.com",
+            projectId: "digi-2eb26",
+            storageBucket: "digi-2eb26.firebasestorage.app",
+            messagingSenderId: "374375506797",
+            appId: "1:374375506797:web:13d102e059e194ceaf7064"
         };
-        mobileMenuBtn.addEventListener('click', toggleMenu);
-        mobileMenuCloseBtn.addEventListener('click', toggleMenu);
-        mobileNavLinks.forEach(link => {
-            link.addEventListener('click', toggleMenu);
-        });
+        const app = initializeApp(firebaseConfig);
+        window.auth = getAuth(app); 
+        const db = getFirestore(app);
 
-        // --- Navbar Visibility on Scroll ---
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > window.innerHeight * 0.8) {
-                navbar.classList.remove('-translate-y-40');
-            } else {
-                navbar.classList.add('-translate-y-40');
-            }
-        });
+        // --- State ---
+        let allUsers = [];
+        let productsMap = new Map();
+        let reviewsMap = new Map();
+        let userMap = new Map();
+        let couponsMap = new Map();
+        let paymentQRsMap = new Map();
+        let currentProduct = null;
+        let currentReview = null;
+        let currentCoupon = null;
+        let currentQr = null;
+        
+        // --- App Entry Point ---
+        document.addEventListener('DOMContentLoaded', main);
 
-        // --- Intersection Observer for Animations & Active Nav Link ---
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    
-                    const sectionId = entry.target.id;
-                    document.body.dataset.section = sectionId;
-                    updateGlow(sectionId);
-
-                    // Update active nav link for desktop
-                    const activeLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-                    navLinks.forEach(link => link.classList.remove('active'));
-                    if (activeLink) {
-                        activeLink.classList.add('active');
-                    }
+        function main() {
+            const loginScreen = document.getElementById('login-screen');
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const loginForm = document.getElementById('login-form');
+            const logoutBtn = document.getElementById('logout-btn');
+            
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    loginScreen.classList.add('hidden');
+                    adminDashboard.classList.remove('hidden');
+                    initDashboard();
+                } else {
+                    loginScreen.classList.remove('hidden');
+                    adminDashboard.classList.add('hidden');
                 }
             });
-        }, { threshold: 0.4 });
 
-        sections.forEach(section => {
-            observer.observe(section);
-        });
+            loginForm.addEventListener('submit', async e => {
+                e.preventDefault();
+                const loginError = document.getElementById('login-error');
+                loginError.textContent = '';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error("Login Error:", error.code);
+                    loginError.textContent = "Invalid email or password.";
+                }
+            });
 
-        // Initial animation for hero section
-        document.querySelector('#hero').classList.add('is-visible');
+            logoutBtn.addEventListener('click', () => signOut(auth));
+        }
 
-        // --- Background Glow Effect ---
-        const glow = document.querySelector('.background-glow');
-        function updateGlow(sectionId) {
-            switch(sectionId) {
-                case 'about':
-                    glow.style.background = 'radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0) 60%)'; // Violet
-                    break;
-                case 'projects':
-                    glow.style.background = 'radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0) 60%)'; // Green
-                    break;
-                case 'skills':
-                    glow.style.background = 'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 60%)'; // Blue
-                    break;
-                case 'contact':
-                     glow.style.background = 'radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(236, 72, 153, 0) 60%)'; // Pink
-                    break;
-                default: // hero
-                    glow.style.background = 'radial-gradient(circle, rgba(79, 70, 229, 0.2) 0%, rgba(79, 70, 229, 0) 60%)'; // Indigo
+        function initDashboard() {
+            setupNavigation();
+            setupModalListeners();
+            setupMobileSidebar(); // Initialize mobile menu
+            loadAllData();
+        }
+
+        // --- Mobile Sidebar Logic ---
+        function setupMobileSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const closeBtn = document.getElementById('close-sidebar-btn');
+
+            function openSidebar() {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
             }
+
+            function closeSidebar() {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            menuBtn.addEventListener('click', openSidebar);
+            closeBtn.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar when a link is clicked on mobile
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768) { // Tailwind 'md' breakpoint is 768px
+                        closeSidebar();
+                    }
+                });
+            });
+        }
+
+        function setupModalListeners() {
+            document.getElementById('add-product-btn').addEventListener('click', () => openProductModal());
+            document.getElementById('cancel-product-modal').addEventListener('click', () => closeModal(document.getElementById('product-modal')));
+            document.getElementById('add-review-btn').addEventListener('click', () => openReviewModal());
+            document.getElementById('cancel-review-modal').addEventListener('click', () => closeModal(document.getElementById('review-modal')));
+            document.getElementById('add-coupon-btn').addEventListener('click', () => openCouponModal());
+            document.getElementById('cancel-coupon-modal').addEventListener('click', () => closeModal(document.getElementById('coupon-modal')));
+            document.getElementById('add-qr-btn').addEventListener('click', () => openQrModal());
+            document.getElementById('cancel-qr-modal').addEventListener('click', () => closeModal(document.getElementById('qr-modal')));
+            
+            document.getElementById('user-detail-modal').addEventListener('click', (e) => {
+                if(e.target.matches('.close-modal-btn')) {
+                    closeModal(document.getElementById('user-detail-modal'));
+                }
+            });
+
+            document.getElementById('product-form').addEventListener('submit', handleProductFormSubmit);
+            // Add listener for dynamic variant buttons
+            document.getElementById('product-form').addEventListener('click', e => {
+                if (e.target.id === 'add-variant-btn') {
+                    document.getElementById('variants-container').insertAdjacentHTML('beforeend', createVariantBlockHTML());
+                }
+                if (e.target.classList.contains('remove-variant-btn')) {
+                    e.target.closest('.variant-block').remove();
+                }
+            });
+
+            document.getElementById('review-form').addEventListener('submit', handleReviewFormSubmit);
+            document.getElementById('coupon-form').addEventListener('submit', handleCouponFormSubmit);
+            document.getElementById('qr-form').addEventListener('submit', handleQrFormSubmit);
+            document.getElementById('banner-form').addEventListener('submit', handleBannerFormSubmit);
+            document.getElementById('user-search').addEventListener('input', handleUserSearch);
+        }
+        
+        function setupNavigation() {
+            const links = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+            const mobileHeaderTitle = document.getElementById('mobile-header-title');
+
+            links.forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1) + '-section';
+                    links.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    sections.forEach(s => s.classList.remove('active'));
+                    
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                    }
+                    
+                    // Update mobile header title
+                    if(mobileHeaderTitle) {
+                        mobileHeaderTitle.textContent = link.textContent.trim();
+                    }
+                });
+            });
+        }
+        
+        function loadAllData() {
+            // Load users first to populate userMap for other collections
+            loadUsers().then(() => {
+                // These can now run in parallel
+                loadCollectionData('products', 'products-table', renderProductRow, productsMap, { openFn: openProductModal });
+                loadCollectionData('reviews', 'reviews-table', renderReviewRow, reviewsMap, { openFn: openReviewModal });
+                loadCollectionData('coupons', 'coupons-table', renderCouponRow, couponsMap, { openFn: openCouponModal });
+                loadCollectionData('paymentQRs', 'qrs-table', renderQrRow, paymentQRsMap, { openFn: openQrModal });
+                loadCollectionData('paymentVerifications', 'verifications-table', renderVerificationRow, new Map(), { onSnapshotCallback: updateVerificationUI });
+                
+                loadAllOrders(); 
+                loadDashboardAnalytics();
+                loadBannerContent();
+            }).catch(err => {
+                console.error("Failed to load initial user data. This is likely a security rule issue.", err);
+                 setTimeout(() => {
+                     console.error("CRITICAL ERROR: Failed to load user data. Check Firestore Security Rules.");
+                 }, 500);
+            });
+        }
+
+        async function loadAllOrders() {
+            if (allUsers.length === 0) {
+                console.log("No users found. Skipping order load.");
+                const ordersTable = document.getElementById('orders-table');
+                if (ordersTable) {
+                    ordersTable.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No users found to check for orders.</td></tr>';
+                }
+                const totalOrdersEl = document.getElementById('total-orders');
+                if (totalOrdersEl) totalOrdersEl.textContent = 0;
+                return; 
+            }
+
+            console.log(`Fetching orders for ${allUsers.length} users...`);
+            let allOrders = [];
+            const ordersTable = document.getElementById('orders-table');
+            if (!ordersTable) return;
+            ordersTable.innerHTML = '<tr><td colspan="6" class="p-4 text-center">Loading all user orders...</td></tr>';
+
+            try {
+                const orderPromises = allUsers.map(user => {
+                    const ordersQuery = query(collection(db, 'users', user.id, 'orders'));
+                    return getDocs(ordersQuery);
+                });
+
+                const allUserOrderSnapshots = await Promise.all(orderPromises);
+
+                allUserOrderSnapshots.forEach(snapshot => {
+                    snapshot.docs.forEach(doc => {
+                        allOrders.push({ id: doc.id, ...doc.data() });
+                    });
+                });
+
+                console.log(`Found ${allOrders.length} total orders.`);
+
+                allOrders.sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+
+                if (allOrders.length === 0) {
+                    ordersTable.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">No orders found for any user.</td></tr>';
+                } else {
+                    ordersTable.innerHTML = allOrders.map(order => renderOrderRow(order.id, order)).join('');
+                }
+
+                const totalOrdersEl = document.getElementById('total-orders');
+                if (totalOrdersEl) totalOrdersEl.textContent = allOrders.length;
+
+            } catch (err) {
+                console.error("Error loading all orders:", err);
+                ordersTable.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Error loading orders. Check console and security rules.</td></tr>`;
+            }
+        }
+
+        function loadCollectionData(collectionName, tableId, renderFn, dataMap, options = {}) {
+            const { openFn, onSnapshotCallback } = options;
+            const q = query(collection(db, collectionName));
+
+            onSnapshot(q, (snapshot) => {
+                dataMap.clear();
+                const table = document.getElementById(tableId);
+                if (!table) return;
+
+                const docs = snapshot.docs.sort((a, b) => (b.data().createdAt?.toMillis() || 0) - (a.data().createdAt?.toMillis() || 0));
+                
+                table.innerHTML = docs.map(doc => {
+                    dataMap.set(doc.id, { id: doc.id, ...doc.data() });
+                    return renderFn(doc.id, doc.data());
+                }).join('');
+
+                if (onSnapshotCallback) {
+                    onSnapshotCallback(docs);
+                }
+
+                if (openFn) {
+                    attachTableListeners(tableId, collectionName.slice(0, -1), openFn, deleteDoc, collectionName, dataMap);
+                }
+            }, (error) => { 
+                console.error(`Error loading collection ${collectionName}:`, error);
+                const table = document.getElementById(tableId);
+                if (table) {
+                    const colspan = table.querySelector('thead th')?.length || 5;
+                    table.innerHTML = `<tr><td colspan="${colspan}" class="p-4 text-center text-red-500">Error loading data. Check console and security rules.</td></tr>`;
+                }
+            });
+        }
+        
+        function loadUsers() {
+            return new Promise((resolve, reject) => {
+                const q = query(collection(db, 'users'));
+                onSnapshot(q, (snapshot) => {
+                    userMap.clear();
+                    allUsers = snapshot.docs
+                        .map(doc => ({ id: doc.id, ...doc.data() }))
+                        .sort((a, b) => (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0));
+                        
+                    allUsers.forEach(user => userMap.set(user.id, user.email));
+                    renderUsers(allUsers);
+                    resolve();
+                }, (err) => { 
+                    console.error("Error loading users:", err);
+                    reject(err); 
+                });
+            });
+        }
+
+        const loadDashboardAnalytics = () => {
+            const collectionsToCount = ['products', 'users'];
+            collectionsToCount.forEach(c => {
+                onSnapshot(collection(db, c), (s) => {
+                    const el = document.getElementById(`total-${c}`);
+                    if (el) el.textContent = s.size;
+                }, (err) => {
+                    console.error(`Analytics error (${c}):`, err);
+                    const el = document.getElementById(`total-${c}`);
+                    if (el) el.textContent = 'N/A';
+                });
+            });
+
+            onSnapshot(query(collection(db, 'paymentVerifications'), where("status", "==", "pending")), (s) => {
+                const el = document.getElementById('pending-verifications');
+                if (el) el.textContent = s.size;
+            }, (err) => {
+                console.error("Analytics error (verifications):", err);
+                const el = document.getElementById('pending-verifications');
+                if (el) el.textContent = 'N/A';
+            });
+        };
+        
+        function updateVerificationUI(docs) {
+            const verifications = docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const pending = verifications.filter(v => v.status === 'pending');
+            
+            const recentTable = document.getElementById('recent-verifications-table');
+            if (recentTable) {
+                if (pending.length > 0) {
+                    recentTable.innerHTML = pending.slice(0, 5).map(v => renderRecentVerificationRow(v.id, v)).join('');
+                } else {
+                    recentTable.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">No pending verifications.</td></tr>';
+                }
+            }
+            
+            attachVerificationListeners('verifications-table');
+            attachVerificationListeners('recent-verifications-table');
+            
+            const badge = document.getElementById('pending-verifications-badge');
+            if (badge) {
+                badge.textContent = pending.length;
+                badge.classList.toggle('hidden', pending.length === 0);
+            }
+        }
+
+        function renderUsers(usersToRender) {
+             const table = document.getElementById('users-table');
+             if (!table) return;
+             if (usersToRender.length === 0) {
+                table.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">No users found.</td></tr>';
+                return;
+             }
+             table.innerHTML = usersToRender.map(user => renderUserRow(user.id, user)).join('');
+             attachUserActions();
+        }
+
+        function handleUserSearch(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredUsers = allUsers.filter(user => user.email && user.email.toLowerCase().includes(searchTerm));
+            renderUsers(filteredUsers);
+        }
+
+        // --- Render Functions ---
+        const renderProductRow = (id, data) => {
+            const price = (data.variants && data.variants.length > 0)
+                ? `From ₹${Math.min(...data.variants.map(v => v.price || 0))}`
+                : 'N/A';
+            const stock = data.variants 
+                ? data.variants.reduce((acc, v) => acc + (v.keys?.length || 0), 0)
+                : 0;
+
+            return `<tr>
+                <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">${data.name || 'N/A'}</td>
+                <td class="px-4 py-3">${data.type || 'N/A'}</td>
+                <td class="px-4 py-3">${price}</td>
+                <td class="px-4 py-3">${stock}</td>
+                <td class="px-4 py-3"><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" data-id="${id}" class="sr-only peer featured-toggle" ${data.isFeatured ? 'checked' : ''}><div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-indigo-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div></label></td>
+                <td class="px-4 py-3 whitespace-nowrap space-x-2"><button data-id="${id}" class="edit-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button><button data-id="${id}" class="delete-btn text-red-600 hover:text-red-900 font-medium">Delete</button></td>
+            </tr>`;
+        };
+        
+        const renderOrderRow = (id, data) => `<tr><td class="px-4 py-3 font-medium text-gray-900">${data.orderId || id.slice(0, 8)+'...'}</td><td class="px-4 py-3">${userMap.get(data.userId) || data.userId?.slice(0, 10) + '...' || 'N/A'}</td><td class="px-4 py-3 whitespace-nowrap">${data.phoneNumber || 'N/A'}</td><td class="px-4 py-3">₹${(data.total || 0).toFixed(2)}</td><td class="px-4 py-3 whitespace-nowrap">${data.createdAt?.toDate().toLocaleDateString() || '...'}</td><td class="px-4 py-3">${data.items?.length || 0}</td></tr>`;
+        
+        const renderVerificationRow = (id, data) => `<tr><td class="px-4 py-3 font-medium text-gray-900">${data.userEmail || 'N/A'}</td><td class="px-4 py-3">₹${data.amount || 0}</td><td class="px-4 py-3 font-mono text-xs md:text-sm">${data.transactionId || 'N/A'}</td><td class="px-4 py-3"><span class="status-badge status-${data.status || 'pending'}">${data.status || 'pending'}</span></td><td class="px-4 py-3 whitespace-nowrap">${data.createdAt?.toDate().toLocaleDateString() || '...'}</td><td class="px-4 py-3 whitespace-nowrap space-x-2">${data.status === 'pending' ? `<button data-id="${id}" data-user-id="${data.userId}" data-amount="${data.amount}" class="approve-btn text-green-600 hover:text-green-900 font-medium">Approve</button><button data-id="${id}" class="reject-btn text-red-600 hover:text-red-900 font-medium">Reject</button>` : ''}</td></tr>`;
+        
+        const renderRecentVerificationRow = (id, data) => `<tr><td class="px-4 md:px-6 py-4 font-medium text-gray-900">${data.userEmail || 'N/A'}</td><td class="px-4 md:px-6 py-4">₹${data.amount || 0}</td><td class="px-4 md:px-6 py-4 font-mono text-xs">${data.transactionId || 'N/A'}</td><td class="px-4 md:px-6 py-4 whitespace-nowrap">${data.createdAt?.toDate().toLocaleDateString() || '...'}</td><td class="px-4 md:px-6 py-4 whitespace-nowrap space-x-2"><button data-id="${id}" data-user-id="${data.userId}" data-amount="${data.amount}" class="approve-btn text-green-600 hover:text-green-900 font-medium">Approve</button><button data-id="${id}" class="reject-btn text-red-600 hover:text-red-900 font-medium">Reject</button></td></tr>`;
+        
+        const renderReviewRow = (id, data) => `<tr><td class="px-4 py-3 font-medium text-gray-900">${data.name || 'N/A'}</td><td class="px-4 py-3">${data.stars || 0}</td><td class="px-4 py-3 truncate max-w-[150px] md:max-w-xs">${data.text || ''}</td><td class="px-4 py-3 whitespace-nowrap space-x-2"><button data-id="${id}" class="edit-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button><button data-id="${id}" class="delete-btn text-red-600 hover:text-red-900 font-medium">Delete</button></td></tr>`;
+        
+        const renderUserRow = (id, data) => `<tr><td class="px-4 py-3 font-medium text-gray-900">${data.email || 'N/A'}</td><td class="px-4 py-3">₹${(data.walletBalance || 0).toFixed(2)}</td><td class="px-4 py-3 whitespace-nowrap">${data.createdAt?.toDate().toLocaleDateString() || 'N/A'}</td><td class="px-4 py-3"><button data-id="${id}" class="view-user-btn text-indigo-600 hover:text-indigo-900 font-medium">View</button></td></tr>`;
+        
+        const renderCouponRow = (id, data) => `<tr><td class="px-4 py-3 font-medium text-gray-900">${data.code || 'N/A'}</td><td class="px-4 py-3">${data.type || 'N/A'}</td><td class="px-4 py-3">${data.type === 'percentage' ? (data.value || 0) + '%' : '₹' + (data.value || 0)}</td><td class="px-4 py-3 whitespace-nowrap space-x-2"><button data-id="${id}" class="edit-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button><button data-id="${id}" class="delete-btn text-red-600 hover:text-red-900 font-medium">Delete</button></td></tr>`;
+
+        const renderQrRow = (id, data) => `<tr><td class="px-4 py-3 font-medium text-gray-900">${data.name || 'N/A'}</td><td class="px-4 py-3 truncate max-w-[150px] md:max-w-xs">${data.imageUrl || 'N/A'}</td><td class="px-4 py-3"><img src="${data.imageUrl || 'https://placehold.co/40x40/e2e8f0/64748b?text=QR'}" alt="${data.name}" class="w-10 h-10 object-cover rounded-md border"></td><td class="px-4 py-3 whitespace-nowrap space-x-2"><button data-id="${id}" class="edit-btn text-indigo-600 hover:text-indigo-900 font-medium">Edit</button><button data-id="${id}" class="delete-btn text-red-600 hover:text-red-900 font-medium">Delete</button></td></tr>`;
+
+        // --- MODAL & FORM LOGIC ---
+        function openModal(modal) { modal.classList.remove('hidden'); setTimeout(() => modal.classList.remove('opacity-0'), 10); }
+        function closeModal(modal) { modal.classList.add('opacity-0'); setTimeout(() => modal.classList.add('hidden'), 300); }
+        
+        // --- NEW: Helper function to create HTML for a single variant block ---
+        function createVariantBlockHTML(variant = {}) {
+            const name = variant.name || '';
+            const price = variant.price || '';
+            const discountPrice = variant.discountPrice || '';
+            const keys = variant.keys?.join('\n') || '';
+
+            return `
+            <div class="variant-block border rounded-lg p-4 bg-gray-50 space-y-3 relative">
+                <button type="button" class="remove-variant-btn absolute -top-2 -right-2 bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center text-sm font-bold">&times;</button>
+                
+                <div>
+                    <label class="font-medium text-sm">Variant Name</label>
+                    <input name="variantName" value="${name}" class="mt-1 block w-full border rounded-md p-2 text-sm" placeholder="e.g., 1 Month Plan" required>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="font-medium text-sm">Price</label>
+                        <input type="number" step="0.01" name="variantPrice" value="${price}" class="mt-1 block w-full border rounded-md p-2 text-sm" placeholder="199" required>
+                    </div>
+                    <div>
+                        <label class="font-medium text-sm">Discount Price <span class="text-gray-400">(Opt.)</span></label>
+                        <input type="number" step="0.01" name="variantDiscountPrice" value="${discountPrice}" class="mt-1 block w-full border rounded-md p-2 text-sm" placeholder="99">
+                    </div>
+                </div>
+                <div>
+                    <label class="font-medium text-sm">Product Keys <span class="text-gray-400">(One per line)</span></label>
+                    <textarea name="variantKeys" class="mt-1 block w-full border rounded-md p-2 h-24 text-sm font-mono" placeholder="KEY1...">${keys}</textarea>
+                </div>
+            </div>`;
+        }
+        
+        function openProductModal(product = null) {
+            currentProduct = product;
+            const productModal = document.getElementById('product-modal');
+            const form = productModal.querySelector('form');
+            document.getElementById('product-modal-title').textContent = product ? 'Edit Product' : 'Add Product';
+            
+            // Reset main form fields
+            form.name.value = product?.name || '';
+            form.description.value = product?.description || '';
+            form.type.value = product?.type || 'OTT';
+            form.imageUrl.value = product?.imageUrl || '';
+            form.isFeatured.checked = product?.isFeatured || false;
+
+            // Build and fill variants
+            const variantsContainer = document.getElementById('variants-container');
+            if (product?.variants && product.variants.length > 0) {
+                variantsContainer.innerHTML = product.variants.map(createVariantBlockHTML).join('');
+            } else {
+                // Add one empty block for new products
+                variantsContainer.innerHTML = createVariantBlockHTML();
+            }
+
+            openModal(productModal);
+        }
+        
+        async function handleProductFormSubmit(e) {
+            e.preventDefault();
+            const productModal = document.getElementById('product-modal');
+            const formData = new FormData(e.target);
+
+            // --- NEW: Read variants from the dynamic blocks ---
+            const variants = [];
+            const variantBlocks = document.querySelectorAll('.variant-block');
+            
+            for (const block of variantBlocks) {
+                const name = block.querySelector('[name="variantName"]').value;
+                const price = Number(block.querySelector('[name="variantPrice"]').value);
+                const discountPrice = Number(block.querySelector('[name="variantDiscountPrice"]').value) || null;
+                const keys = block.querySelector('[name="variantKeys"]').value
+                    .split('\n')
+                    .map(k => k.trim())
+                    .filter(k => k);
+                
+                if (name && price > 0) {
+                    variants.push({ name, price, discountPrice, keys });
+                }
+            }
+
+            if (variants.length === 0) {
+                alert("You must add at least one valid variant with a name and price.");
+                return;
+            }
+            // --- End of new variant logic ---
+
+            const data = {
+                name: formData.get('name'),
+                type: formData.get('type'),
+                imageUrl: formData.get('imageUrl'),
+                description: formData.get('description'),
+                isFeatured: formData.get('isFeatured') === 'on',
+                variants: variants, // <-- NEW: Use the variants array
+                updatedAt: serverTimestamp()
+            };
+            
+            // Note: We no longer save top-level price, discountPrice, or keys
+            
+            if (currentProduct) { 
+                await updateDoc(doc(db, 'products', currentProduct.id), data); 
+            } 
+            else { 
+                data.createdAt = serverTimestamp();
+                await addDoc(collection(db, 'products'), data); 
+            }
+            closeModal(productModal);
+        }
+        
+        function openReviewModal(review = null) {
+            currentReview = review;
+            const reviewModal = document.getElementById('review-modal');
+            document.getElementById('review-modal-title').textContent = review ? 'Edit Review' : 'Add Review';
+            reviewModal.querySelector('.space-y-4').innerHTML = `
+                <div><label class="font-medium">Customer Name</label><input name="name" value="${review?.name || ''}" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label class="font-medium">Stars (1-5)</label><input type="number" name="stars" min="1" max="5" value="${review?.stars || '5'}" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label class="font-medium">Review Text</label><textarea name="text" class="mt-1 block w-full border rounded-md p-2 h-24" required>${review?.text || ''}</textarea></div>`;
+            openModal(reviewModal);
+        }
+        
+        async function handleReviewFormSubmit(e) {
+            e.preventDefault();
+            const reviewModal = document.getElementById('review-modal');
+            const data = {
+                name: e.target.name.value, stars: Number(e.target.stars.value),
+                text: e.target.text.value, 
+                updatedAt: serverTimestamp()
+            };
+            if (currentReview) { await updateDoc(doc(db, 'reviews', currentReview.id), data); } 
+            else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'reviews'), data); }
+            closeModal(reviewModal);
+        }
+
+        function openCouponModal(coupon = null) {
+            currentCoupon = coupon;
+            const couponModal = document.getElementById('coupon-modal');
+            document.getElementById('coupon-modal-title').textContent = coupon ? 'Edit Coupon' : 'Add Coupon';
+            couponModal.querySelector('.space-y-4').innerHTML = `
+                <div><label class="font-medium">Code</label><input name="code" value="${coupon?.code || ''}" class="uppercase mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label class="font-medium">Type</label><select name="type" class="mt-1 block w-full border rounded-md p-2"><option value="percentage" ${coupon?.type === 'percentage' ? 'selected' : ''}>Percentage</option><option value="fixed" ${coupon?.type === 'fixed' ? 'selected' : ''}>Fixed Amount</option></select></div>
+                <div><label class="font-medium">Value</label><input type="number" name="value" value="${coupon?.value || ''}" class="mt-1 block w-full border rounded-md p-2" required></div>`;
+            openModal(couponModal);
+        }
+
+        async function handleCouponFormSubmit(e) {
+            e.preventDefault();
+            const couponModal = document.getElementById('coupon-modal');
+            const data = {
+                code: e.target.code.value.toUpperCase(), type: e.target.type.value,
+                value: Number(e.target.value.value), 
+                updatedAt: serverTimestamp()
+            };
+            if (currentCoupon) { await updateDoc(doc(db, 'coupons', currentCoupon.id), data); } 
+            else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'coupons'), data); }
+            closeModal(couponModal);
+        }
+
+        function openQrModal(qr = null) {
+            currentQr = qr;
+            const qrModal = document.getElementById('qr-modal');
+            document.getElementById('qr-modal-title').textContent = qr ? 'Edit QR Code' : 'Add QR Code';
+            qrModal.querySelector('.space-y-4').innerHTML = `
+                <div><label class="font-medium">Name (e.g. Paytm)</label><input name="name" value="${qr?.name || ''}" class="mt-1 block w-full border rounded-md p-2" required></div>
+                <div><label class="font-medium">Image URL</label><input name="imageUrl" value="${qr?.imageUrl || ''}" class="mt-1 block w-full border rounded-md p-2" required></div>
+            `;
+            openModal(qrModal);
+        }
+
+        async function handleQrFormSubmit(e) {
+            e.preventDefault();
+            const qrModal = document.getElementById('qr-modal');
+            const data = {
+                name: e.target.name.value, imageUrl: e.target.imageUrl.value,
+                updatedAt: serverTimestamp()
+            };
+            if (currentQr) { await updateDoc(doc(db, 'paymentQRs', currentQr.id), data); } 
+            else { data.createdAt = serverTimestamp(); await addDoc(collection(db, 'paymentQRs'), data); }
+            closeModal(qrModal);
+        }
+
+        function openUserDetailModal(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+            document.getElementById('user-detail-content').innerHTML = `
+                <button type="button" class="close-modal-btn absolute top-4 right-4 text-2xl text-gray-500 hover:text-gray-800 p-2" data-modal-id="user-detail-modal">&times;</button>
+                <div class="flex flex-col sm:flex-row justify-between items-start mb-6 gap-4">
+                    <h3 class="text-xl md:text-2xl font-bold break-all">${user.email}</h3>
+                    <a href="mailto:${user.email}" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md text-sm hover:bg-gray-300 flex-shrink-0"><i class="fas fa-envelope mr-2"></i>Send Email</a>
+                </div>
+                <div class="mb-6"><p class="text-gray-600">Current Balance: <span class="font-bold text-xl">₹${(user.walletBalance || 0).toFixed(2)}</span></p></div>
+                <form id="wallet-adjustment-form" class="mb-6 p-4 border rounded-md bg-gray-50">
+                     <h4 class="font-semibold mb-3">Adjust Wallet</h4>
+                     <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-2">
+                         <input type="number" step="0.01" id="adjustment-amount" placeholder="Amount (+/-)" class="flex-grow border rounded-md p-2" required>
+                         <input type="text" id="adjustment-reason" placeholder="Reason" class="flex-grow border rounded-md p-2" required>
+                         <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">Adjust</button>
+                    </div>
+                </form>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><h4 class="font-semibold mb-2">Order History</h4><div id="user-orders-history" class="max-h-40 overflow-y-auto border rounded-md p-2 bg-gray-50">Loading...</div></div>
+                    <div><h4 class="font-semibold mb-2">Wallet History</h4><div id="user-wallet-history" class="max-h-40 overflow-y-auto border rounded-md p-2 bg-gray-50">Loading...</div></div>
+                </div>`;
+            
+            openModal(document.getElementById('user-detail-modal'));
+            
+            loadUserHistory(userId, 'orders', 'user-orders-history', `users/${userId}/orders`);
+            loadUserHistory(userId, 'walletTransactions', 'user-wallet-history', `users/${userId}/walletTransactions`);
+
+            document.getElementById('wallet-adjustment-form').addEventListener('submit', e => {
+                e.preventDefault();
+                const amount = parseFloat(document.getElementById('adjustment-amount').value);
+                const reason = document.getElementById('adjustment-reason').value;
+                if(amount && reason) adjustUserWallet(userId, amount, reason);
+            });
+        }
+        
+        function attachTableListeners(tableId, type, openFn, deleteFn, collectionName, dataMap) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            // Remove old listeners by cloning
+            const newTable = table.cloneNode(true);
+            table.parentNode.replaceChild(newTable, table);
+            
+            newTable.addEventListener('click', async e => {
+                // Handle clicks on the buttons or icons inside them
+                const target = e.target.closest('button') || e.target;
+                const id = target.dataset.id || e.target.dataset.id; 
+                if (!id) return;
+
+                if (target.classList.contains('edit-btn')) { const data = dataMap.get(id); if (data) openFn(data); }
+                if (target.classList.contains('delete-btn')) { if (confirm(`Are you sure you want to delete this ${type}?`)) { await deleteFn(doc(db, collectionName, id)); } }
+                if (e.target.classList.contains('featured-toggle')) { await updateDoc(doc(db, 'products', id), { isFeatured: e.target.checked }); }
+            });
+        }
+
+        function attachUserActions() { 
+            const table = document.getElementById('users-table');
+             if (!table) return;
+             // Clone to remove old listeners
+             const newTable = table.cloneNode(true);
+             table.parentNode.replaceChild(newTable, table);
+             
+             newTable.addEventListener('click', e => {
+                  const target = e.target.closest('.view-user-btn');
+                  if (target) {
+                    openUserDetailModal(target.dataset.id);
+                  }
+             });
+        }
+
+        function attachVerificationListeners(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            
+            const newTable = table.cloneNode(true);
+            table.parentNode.replaceChild(newTable, table);
+            
+            newTable.addEventListener('click', e => {
+                const target = e.target.closest('button');
+                if (!target) return;
+                const id = target.dataset.id; if (!id) return;
+                
+                if (target.classList.contains('approve-btn')) { approveVerification(id, target.dataset.userId, Number(target.dataset.amount)); }
+                if (target.classList.contains('reject-btn')) { rejectVerification(id); }
+            });
+        }
+
+        async function approveVerification(verificationId, userId, amount) {
+            if (!userId || !amount) { 
+                console.error("Missing userId or amount", verificationId, userId, amount);
+                alert("Error: Missing user ID or amount."); 
+                return; 
+            }
+            const loaderOverlay = document.getElementById('loader-overlay');
+            loaderOverlay.classList.remove('hidden', 'opacity-0');
+            const verificationRef = doc(db, "paymentVerifications", verificationId);
+            const userRef = doc(db, "users", userId);
+            const walletTxRef = doc(collection(db, 'users', userId, 'walletTransactions'));
+
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw "User document not found!";
+                    const newBalance = (userDoc.data().walletBalance || 0) + amount;
+                    
+                    transaction.update(userRef, { walletBalance: newBalance });
+                    transaction.update(verificationRef, { status: "approved" });
+                    transaction.set(walletTxRef, { userId: userId, amount: amount, type: 'credit', description: 'Wallet top-up (Approved)', createdAt: serverTimestamp() });
+                });
+            } catch (error) { console.error("Transaction failed: ", error); alert("Transaction failed: " + error); } 
+            finally { loaderOverlay.classList.add('hidden', 'opacity-0'); }
+        }
+
+        async function rejectVerification(verificationId) { 
+            try { await updateDoc(doc(db, "paymentVerifications", verificationId), { status: 'rejected' }); } 
+            catch (err) { console.error("Rejection failed:", err); alert("Rejection failed: " + err.message); }
+        }
+        
+        async function adjustUserWallet(userId, amount, reason) {
+            const loaderOverlay = document.getElementById('loader-overlay');
+            loaderOverlay.classList.remove('hidden', 'opacity-0');
+            const userRef = doc(db, "users", userId);
+            const walletTxRef = doc(collection(db, 'users', userId, 'walletTransactions'));
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw "User not found";
+                    const newBalance = (userDoc.data().walletBalance || 0) + amount;
+                    transaction.update(userRef, { walletBalance: newBalance });
+                    transaction.set(walletTxRef, { userId: userId, amount: Math.abs(amount), type: amount > 0 ? 'credit' : 'debit', description: `Admin: ${reason}`, createdAt: serverTimestamp() });
+                });
+                closeModal(document.getElementById('user-detail-modal'));
+            } catch (error) { console.error("Wallet adjustment failed:", error); alert("Wallet adjustment failed: " + error); } 
+            finally { loaderOverlay.classList.add('hidden', 'opacity-0'); }
+        }
+
+        async function loadUserHistory(userId, collectionName, elementId, collectionPath) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            const q = query(collection(db, collectionPath), orderBy("createdAt", "desc"));
+            try {
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) { container.innerHTML = `<p class="text-gray-500 text-sm">No history found.</p>`; return; }
+                if (collectionName === 'orders') {
+                    container.innerHTML = snapshot.docs.map(doc => `<div class="text-sm p-2 border-b last:border-b-0">${doc.data().createdAt?.toDate().toLocaleDateString() || 'N/A'}: ${doc.data().items?.length || 0} items - ₹${(doc.data().total || 0).toFixed(2)}</div>`).join('');
+                } else if (collectionName === 'walletTransactions') {
+                     container.innerHTML = snapshot.docs.map(doc => `<div class="text-sm p-2 border-b last:border-b-0 flex justify-between"><span>${doc.data().description}</span><span class="${doc.data().type === 'credit' ? 'text-green-600' : 'text-red-600'}">₹${(doc.data().amount || 0).toFixed(2)}</span></div>`).join('');
+                }
+            } catch (err) { console.error(`Error loading history:`, err); container.innerHTML = `<p class="text-red-500 text-sm">Error loading history.</p>`; }
+        }
+        
+        async function loadBannerContent() {
+            try {
+                const docSnap = await getDoc(doc(db, 'siteContent', 'homepage'));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const bannerForm = document.getElementById('banner-form');
+                    bannerForm.heroTitle.value = data.heroTitle || '';
+                    bannerForm.heroSubtitle.value = data.heroSubtitle || '';
+                    bannerForm.heroImageUrl.value = data.heroImageUrl || '';
+                    bannerForm.heroButtonText.value = data.heroButtonText || '';
+                    bannerForm.heroButtonLink.value = data.heroButtonLink || '';
+                }
+            } catch (err) { console.error("Error loading banner content:", err); }
+        }
+
+        async function handleBannerFormSubmit(e) {
+            e.preventDefault();
+            const loaderOverlay = document.getElementById('loader-overlay');
+            loaderOverlay.classList.remove('hidden', 'opacity-0');
+            const bannerForm = document.getElementById('banner-form');
+            const data = {
+                heroTitle: bannerForm.heroTitle.value, heroSubtitle: bannerForm.heroSubtitle.value,
+                heroImageUrl: bannerForm.heroImageUrl.value, heroButtonText: bannerForm.heroButtonText.value,
+                heroButtonLink: bannerForm.heroButtonLink.value,
+            };
+            try { await setDoc(doc(db, 'siteContent', 'homepage'), data, { merge: true }); } 
+            catch (error) { console.error("Error saving banner:", error); alert("Failed to save banner."); }
+            finally { loaderOverlay.classList.add('hidden', 'opacity-0'); }
         }
     </script>
 </body>
